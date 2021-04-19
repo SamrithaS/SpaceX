@@ -3,44 +3,14 @@ import logo from "./logo.svg";
 import group from "./Group.svg";
 import arrow from "./arrow.svg";
 import filter from "./filter.svg";
+import calendar from "./calendar.svg";
 import "./App.css";
-import { Table, Tag, Dropdown, Menu, message } from "antd";
-// import Dropdown from "./Dropdown";
+import { FetchList } from "./Api";
+import { Table, Tag, Dropdown, Menu} from "antd";
 import "antd/dist/antd.css";
 import "./index.css";
 function App() {
-  type IList = {
-    flight_number: number;
-    mission_name: string;
-    details: string;
-    rocket: {
-      rocket_id: string;
-    };
-  }[];
-  const [dataSource, setDataSource] = useState<IList>([
-    {
-      flight_number: 0,
-      mission_name: "",
-      details: "",
-      rocket: {
-        rocket_id: ""
-      }
-    }
-  ]);
-  const [filterType, setFilterType]= useState<string>("All Launches")
-
-  useEffect(() => {
-    fetchList();
-  }, []);
-
-  const fetchList = () => {
-    return fetch("https://api.spacexdata.com/v3/launches?limit=80&offset=0")
-      .then(res => res.json())
-      .then(val => {
-        setDataSource(val);
-      })
-      .catch(err => console.error("err", err));
-  };
+  const [filterType, setFilterType] = useState<string>("All Launches");
 
   const columns = [
     {
@@ -86,40 +56,48 @@ function App() {
       key: "Rocket"
     }
   ];
-  const onClick = ( event:any):any =>{
-   setFilterType(event.item.props.children[1])
-    
+
+  const onClick = (event: any): any => {
+    setFilterType(event.item.props.children[1]);
   };
+
   const menu = (
     <Menu onClick={onClick}>
       <Menu.Item key="1">All Launches</Menu.Item>
       <Menu.Item key="2">Successful Launches</Menu.Item>
       <Menu.Item key="3">Failed Launches</Menu.Item>
     </Menu>
-  )
+  );
+
   return (
     <div className="App">
       <div className="svg-wrapper">
         <img src={group} />
       </div>
-     
+
       <div className="wrapper">
         <div className="flex">
-      <Dropdown overlay={menu} trigger={['click']}>
-        <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
-        All Launches
-        <img src={arrow} />
-        </a>
-      </Dropdown>
-      <Dropdown overlay={menu} trigger={['click']}>
-        <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
-        <img src={filter} className="filter"/>
-        {filterType}
-        <img src={arrow} />
-        </a>
-      </Dropdown>
-      </div>
-        <Table dataSource={dataSource} columns={columns} />
+          <Dropdown overlay={menu} trigger={["click"]}>
+            <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+              <img src={calendar} className="filter" />
+              Past 6 Months
+              <img src={arrow} />
+            </a>
+          </Dropdown>
+          <Dropdown overlay={menu} trigger={["click"]}>
+            <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+              <img src={filter} className="filter" />
+              {filterType}
+              <img src={arrow} />
+            </a>
+          </Dropdown>
+        </div>
+        <Table
+          dataSource={FetchList(
+            "https://api.spacexdata.com/v3/launches?limit=80&offset=0"
+          )}
+          columns={columns}
+        />
       </div>
     </div>
   );
