@@ -94,7 +94,7 @@ function App() {
         </div>
         <Table
           dataSource={FetchList(
-            "https://api.spacexdata.com/v3/launches?limit=80&offset=0"
+            {api:"https://api.spacexdata.com/v3/launches?limit=50&offset=0",launch_success:filterType==="Successful Launches"?true:false, launch_failure:filterType==="Failed Launches"?true:false}
           )}
           columns={columns}
         />
