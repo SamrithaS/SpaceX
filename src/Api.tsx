@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 type IList = {
   flight_number: number;
   mission_name: string;
@@ -11,7 +11,7 @@ interface Iapi {
   api: string;
   launch_success?: boolean;
   launch_failure?: boolean;
-};
+}
 export const FetchList = ({ api, launch_success, launch_failure }: Iapi) => {
   const [dataSource, setDataSource] = useState<IList>([
     {
