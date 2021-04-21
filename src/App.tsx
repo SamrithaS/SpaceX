@@ -33,8 +33,25 @@ function App() {
     manufacturer: string;
     nationality: string;
   }
-
-  const showModal = (r: any) => {
+  interface IList {
+    flight_number: number;
+    mission_name: string;
+    details: string;
+    launch_success: boolean;
+    rocket: {
+      rocket_name: string;
+      rocket_id: string;
+      second_stage: {
+        payloads: {
+          orbit: string;
+          manufacturer: string;
+          nationality: string;
+        }[];
+      };
+      rocket_type: string;
+    };
+  }
+  const showModal = (r: IList) => {
     setDetails({
       mission_name: r.mission_name,
       rocket_name: r.rocket.rocket_name,
