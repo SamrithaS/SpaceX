@@ -24,7 +24,7 @@ export const FetchList = ({ api, launch_success, launch_failure }: Iapi) => {
     }
   ]);
   useEffect(() => {
-    const fetchApi = async () => {
+    const fetchApi = () => {
       return fetch(
         launch_success ? api.concat(`&launch_success=${launch_success}`) : api
       )
@@ -44,7 +44,9 @@ export const FetchList = ({ api, launch_success, launch_failure }: Iapi) => {
               }) => {
                 if (item.launch_success === false) {
                   results.push(item);
+                  
                 }
+                return results
               }
             );
             setDataSource(results);

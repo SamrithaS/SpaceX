@@ -1,13 +1,28 @@
 import React, { useState } from "react";
-import group from "./Group.svg";
-import arrow from "./arrow.svg";
-import filter from "./filter.svg";
-import calendar from "./calendar.svg";
+import group from "./svgs/Group.svg";
+import arrow from "./svgs/arrow.svg";
+import filter from "./svgs/filter.svg";
+import calendar from "./svgs/calendar.svg";
+import Modals from "./components/Modal";
+import Dropdowns from "./components/dropDown";
 import "./App.css";
 import { FetchList } from "./Api";
-import { Table, Tag, Dropdown, Menu, Modal } from "antd";
+import { Table, Tag, Menu } from "antd";
 import "antd/dist/antd.css";
 import "./index.css";
+
+export interface Idetails {
+  mission_name: string;
+  rocket_name: string;
+  launch_status: boolean;
+  orbit: string;
+  details: string;
+  flight_number: number;
+  rocket_type: string | number;
+  manufacturer: string;
+  nationality: string;
+}
+
 function App() {
   const [filterType, setFilterType] = useState<string>("All Launches");
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
@@ -22,17 +37,7 @@ function App() {
     manufacturer: "",
     nationality: ""
   });
-  interface Idetails {
-    mission_name: string;
-    rocket_name: string;
-    launch_status: boolean;
-    orbit: string;
-    details: string;
-    flight_number: number;
-    rocket_type: string | number;
-    manufacturer: string;
-    nationality: string;
-  }
+
   interface IList {
     flight_number: number;
     mission_name: string;
@@ -51,17 +56,17 @@ function App() {
       rocket_type: string;
     };
   }
-  const showModal = (r: IList) => {
+  const showModal = (record: IList) => {
     setDetails({
-      mission_name: r.mission_name,
-      rocket_name: r.rocket.rocket_name,
-      launch_status: r.launch_success,
-      orbit: r.rocket.second_stage.payloads[0].orbit,
-      details: r.details,
-      flight_number: r.flight_number,
-      rocket_type: r.rocket.rocket_type,
-      manufacturer: r.rocket.second_stage.payloads[0].manufacturer,
-      nationality: r.rocket.second_stage.payloads[0].nationality
+      mission_name: record.mission_name,
+      rocket_name: record.rocket.rocket_name,
+      launch_status: record.launch_success,
+      orbit: record.rocket.second_stage.payloads[0].orbit,
+      details: record.details,
+      flight_number: record.flight_number,
+      rocket_type: record.rocket.rocket_type,
+      manufacturer: record.rocket.second_stage.payloads[0].manufacturer,
+      nationality: record.rocket.second_stage.payloads[0].nationality
     });
     setIsModalVisible(true);
   };
@@ -119,7 +124,7 @@ function App() {
     }
   ];
 
-  const onClick = (event: any): any => {
+  const onClick = (event: { item: { props: { children: string[] } } }) => {
     setFilterType(event.item.props.children[1]);
   };
 
@@ -130,33 +135,45 @@ function App() {
       <Menu.Item key="3">Failed Launches</Menu.Item>
     </Menu>
   );
-
+  const menu2 = (
+    <Menu>
+      <Menu.Item key="1">past week</Menu.Item>
+      <Menu.Item key="2">past month</Menu.Item>
+      <Menu.Item key="3">past 3 months</Menu.Item>
+      <Menu.Item key="3">past 6 months</Menu.Item>
+      <Menu.Item key="3">past year</Menu.Item>
+      <Menu.Item key="3">past 2 years</Menu.Item>
+    </Menu>
+  );
   return (
     <div className="App">
       <div className="svg-wrapper">
-        <img src={group} />
+        <img src={group} alt="" />
       </div>
-
+      <Modals
+        handleCancel={handleCancel}
+        isModalVisible={isModalVisible}
+        handleOk={handleOk}
+        details={details}
+      />
       <div className="wrapper">
         <div className="flex">
-          <Dropdown overlay={menu} trigger={["click"]}>
-            <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
-              <img src={calendar} className="filter" />
-              Past 6 Months
-              <img src={arrow} />
-            </a>
-          </Dropdown>
-          <Dropdown overlay={menu} trigger={["click"]}>
-            <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
-              <img src={filter} className="filter" />
-              {filterType}
-              <img src={arrow} />
-            </a>
-          </Dropdown>
+          <Dropdowns
+            overlay={menu2}
+            src1={calendar}
+            src2={arrow}
+            content="Past 6 Months"
+          />
+          <Dropdowns
+            overlay={menu}
+            src1={filter}
+            src2={arrow}
+            content={filterType}
+          />
         </div>
         <Table
-          onRow={(r: any) => ({
-            onClick: () => showModal(r)
+          onRow={(record: IList) => ({
+            onClick: () => showModal(record)
           })}
           dataSource={FetchList({
             api: "https://api.spacexdata.com/v3/launches?limit=50&offset=0",
@@ -166,59 +183,6 @@ function App() {
           columns={columns}
         />
       </div>
-      <Modal
-        title=""
-        visible={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        footer=""
-      >
-        <div>
-          <div className="flex-center">
-            <div>
-              <p className="name">{details.mission_name}</p>
-              <p className="number">{details.flight_number}</p>
-            </div>
-            <p>
-              {" "}
-              <Tag className={details.launch_status ? "green" : "red"} key={1}>
-                {details.launch_status ? "Success" : "Failed"}
-              </Tag>
-            </p>
-          </div>
-          <p className="details">
-            {details.details ? details.details : "No details available"}
-          </p>
-          <div className="wrap">
-            <p>Flight Number</p>
-            <p>{details.flight_number}</p>
-          </div>
-          <div className="wrap">
-            <p>Mission Name</p>
-            <p>{details.mission_name}</p>
-          </div>
-          <div className="wrap">
-            <p>Rocket Type</p>
-            <p>{details.rocket_type}</p>
-          </div>
-          <div className="wrap">
-            <p>Rocket Name</p>
-            <p>{details.rocket_name}</p>
-          </div>
-          <div className="wrap">
-            <p>Manufacturer</p>
-            <p>{details.manufacturer}</p>
-          </div>
-          <div className="wrap">
-            <p>Nationality</p>
-            <p>{details.nationality}</p>
-          </div>
-          <div className="wrap">
-            <p>Orbit</p>
-            <p>{details.orbit}</p>
-          </div>
-        </div>
-      </Modal>
     </div>
   );
 }

@@ -50,6 +50,7 @@ td {
   display: flex;
   align-items: center;
   max-width: 200px;
+  cursor: pointer;
 }
 .ant-dropdown-trigger {
   color: #4b5563;
